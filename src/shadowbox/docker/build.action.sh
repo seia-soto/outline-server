@@ -19,15 +19,14 @@ export DOCKER_CONTENT_TRUST="${DOCKER_CONTENT_TRUST:-1}"
 export DOCKER_BUILDKIT=1
 
 # Newer node images have no valid content trust data.
-# Pin the image node:16.12-alpine3.14 by hash.
+# Pin the image node:16.12-alpine3.14 by tag for multi-platform support.
 # See versions at https://hub.docker.com/_/node/
-readonly NODE_IMAGE="node@sha256:b45a4d2e291af6ed859c8e54d4f70389443373b9293c469b80b5435046127a75"
+readonly NODE_IMAGE="node:16.12-alpine3.14"
 
-# Doing an explicit `docker pull` of the container base image to work around an issue where
-# Travis fails to pull the base image when using BuildKit. Seems to be related to:
-# https://github.com/moby/buildkit/issues/606 and https://github.com/moby/buildkit/issues/1397
-docker pull "${NODE_IMAGE}"
-docker build --force-rm \
+# Use Docker Buildx for building multi-platform images.
+docker buildx \
+    --push \
+    --force-rm \
     --build-arg NODE_IMAGE="${NODE_IMAGE}" \
     --build-arg GITHUB_RELEASE="${TRAVIS_TAG:-none}" \
     -f src/shadowbox/docker/Dockerfile \

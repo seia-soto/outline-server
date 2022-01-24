@@ -21,11 +21,19 @@ mkdir -p "${OUT_DIR}"
 webpack --config=src/shadowbox/webpack.config.js ${BUILD_ENV:+--mode="${BUILD_ENV}"}
 
 # Install third_party dependencies
-readonly OS="$([[ "$(uname)" == "Darwin" ]] && echo "macos" || echo "linux")"
+if [[ "$(uname)" == "Darwin" ]]; then
+  readonly OS="macos"
+  readonly ARCH="x86_64"
+else
+  readonly OS="linux"
+  readonly ARCH="$(uname -m)"
+fi
+
 readonly BIN_DIR="${OUT_DIR}/bin"
+
 mkdir -p "${BIN_DIR}"
-cp "${ROOT_DIR}/third_party/prometheus/${OS}/prometheus" "${BIN_DIR}/"
-cp "${ROOT_DIR}/third_party/outline-ss-server/${OS}/outline-ss-server" "${BIN_DIR}/"
+cp "${ROOT_DIR}/third_party/prometheus/${OS}/prometheus_${ARCH}" "${BIN_DIR}/prometheus"
+cp "${ROOT_DIR}/third_party/outline-ss-server/${OS}/outline-ss-server_${ARCH}" "${BIN_DIR}/outline-ss-server"
 
 # Copy shadowbox package.json
 cp "${ROOT_DIR}/src/shadowbox/package.json" "${OUT_DIR}/"
