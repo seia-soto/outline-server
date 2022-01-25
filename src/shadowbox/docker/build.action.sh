@@ -18,6 +18,9 @@ export DOCKER_CONTENT_TRUST="${DOCKER_CONTENT_TRUST:-1}"
 # Enable Docker BuildKit (https://docs.docker.com/develop/develop-images/build_enhancements)
 export DOCKER_BUILDKIT=1
 
+# Determine if we need to push image.
+[[ "${PUSH_IMAGE:-}" == "1" ]] && PUSH_OPT="--push" || PUSH_OPT=""
+
 # Detect and set architecture for general users to build without installing emulator.
 if [[ -z "${SB_PLATFORM:-}" ]]; then
     SB_PLATFORM="$(uname -m)"
@@ -36,7 +39,7 @@ readonly NODE_IMAGE="node:16.12-alpine3.14"
 # Use Docker Buildx for building multi-platform images.
 docker buildx build \
     --platform="${SB_PLATFORM}" \
-    --push \
+    "${PUSH_OPT}" \
     --force-rm \
     --build-arg NODE_IMAGE="${NODE_IMAGE}" \
     --build-arg GITHUB_RELEASE="${TRAVIS_TAG:-none}" \

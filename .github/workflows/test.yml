@@ -14,9 +14,9 @@ jobs:
         os: [ubuntu-20.04]
         # This doesn't add platform specific hardware in actual, just an array of platforms to emulate
         arch: [
-          x86_64,
-          aarch64,
-          armv7l
+          linux/amd64,
+          linux/arm64,
+          linux/arm/v7
         ]
       # Don't cancel jobs on other platforms if one fails
       fail-fast: false
