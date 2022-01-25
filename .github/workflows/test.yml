@@ -47,14 +47,6 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Shadowbox
-        # We don't need `if` here in current situation
-        # if: runner.os == 'Linux'
-        run: |
-          npm run action shadowbox/server/build
-          npm run action shadowbox/test
-          npm run action shadowbox/integration_test/start
-
       - name: Shadowbox with Docker
         run: |
           export SB_PLATFORM="${{ matrix.arch }}"
