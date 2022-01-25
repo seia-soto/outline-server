@@ -1,16 +1,10 @@
 name: Build and Test
 
-on: 
-  pull_request:
-    branches:
-      - master
-    types:
-      - opened
-      - synchronize
-
+on:
+  push:
 
 jobs:
-  manager:
+  docker:
     name: Build and Test
 
     runs-on: ${{ matrix.os }}
@@ -18,12 +12,27 @@ jobs:
       matrix:
         # This matches the Ubuntu version used in our Travis releases
         os: [ubuntu-20.04]
+        # This doesn't add platform specific hardware in actual, just an array of platforms to emulate
+        arch: [
+          x86_64,
+          aarch64,
+          armv7l
+        ]
       # Don't cancel jobs on other platforms if one fails
       fail-fast: false
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v1
+
+      - name: Install QEMU
+        uses: docker/setup-qemu-action@v1
+        with:
+          image: tonistiigi/binfmt:latest
+          platforms: all
+
+      - name: Install Docker Buildx
+        uses: docker/setup-buildx-action@v1
 
       - name: Install Node.js
         uses: actions/setup-node@v1
@@ -37,21 +46,10 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Manager
+      - name: Shadowbox with Docker
         run: |
-          SENTRY_DSN='test' npm run action server_manager/electron_app/release_linux
-          npm run action server_manager/test
+          export SB_PLATFORM="${{ matrix.arch }}"
+          export SB_IMAGE="shadowbox-test"
 
-      - name: Shadowbox
-        if: runner.os == 'Linux'
-        run: |
-          npm run action shadowbox/server/build
-          npm run action shadowbox/test
-          npm run action shadowbox/integration_test/start
-
-      - name: Metrics Server
-        if: runner.os == 'Linux'
-        run: |
-          npm run action metrics_server/build
-          npm run action metrics_server/test
-
+          npm run action shadowbox/docker/build
+          bash scripts/install_server.sh --hostname test
