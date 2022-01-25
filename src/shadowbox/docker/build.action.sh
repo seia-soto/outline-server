@@ -19,7 +19,7 @@ export DOCKER_CONTENT_TRUST="${DOCKER_CONTENT_TRUST:-1}"
 export DOCKER_BUILDKIT=1
 
 # Detect and set architecture for general users to build without installing emulator.
-if [[ -z "${SB_PLATFORM}" ]]; then
+if [[ -z "${SB_PLATFORM:-}" ]]; then
     SB_PLATFORM="$(uname -m)"
 
     # Specify the target platform with `$SB_PLATFORM`.
