@@ -306,7 +306,7 @@ function start_shadowbox() {
   local -ar docker_shadowbox_flags=(
     --name "${CONTAINER_NAME}" --restart always --net host
     --label 'com.centurylinklabs.watchtower.enable=true'
-    --platform "${SB_PLATFORM}"
+    --platform "${SB_PLATFORM:-linux/amd64}"
     -v "${STATE_DIR}:${STATE_DIR}"
     -e "SB_STATE_DIR=${STATE_DIR}"
     -e "SB_API_PORT=${API_PORT}"
