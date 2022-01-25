@@ -23,7 +23,7 @@ remap_arch() {
   local ARCH="${1}" AMD64="${2:-amd64}" ARM64="${3:-arm64}" ARMv7="${4:-armv7}" ARMv6="${5:-armv6}"
 
   [[ "${ARCH}" == *"amd64"* || "${ARCH}" == *"x86_64"* ]] && ARCH="${AMD64}"
-  [[ "${ARCH}" == *"arm64"* ]] && ARCH="${ARM64}"
+  [[ "${ARCH}" == *"arm64"* || "${ARCH}" == *"aarch64"* ]] && ARCH="${ARM64}"
   [[ "${ARCH}" == *"v7"* ]] && ARCH="${ARMv7}"
   [[ "${ARCH}" == *"v6"* ]] && ARCH="${ARMv6}"
 
