@@ -31,7 +31,7 @@ remap_arch() {
 }
 
 # Specify the target platform with `$SB_PLATFORM`.
-[[ -z "${SB_PLATFORM}" ]] && SB_PLATFORM="$(remap_arch "$(uname -m)" linux/amd64 linux/arm64 linux/arm/v7 linux/arm/v6)"
+[[ -z "${SB_PLATFORM:-}" ]] && SB_PLATFORM="$(remap_arch "$(uname -m)" linux/amd64 linux/arm64 linux/arm/v7 linux/arm/v6)"
 
 # Newer node images have no valid content trust data.
 # Pin the image node:16.12-alpine3.14 by tag for multi-platform support.
