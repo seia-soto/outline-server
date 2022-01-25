@@ -37,7 +37,7 @@ if [[ "$(uname)" == "Darwin" ]]; then
   readonly ARCH="x86_64"
 else
   # Accept `$ARCH` from outside of the script
-  [[ -z "${ARCH}" ]] && ARCH="$(uname -m)"
+  [[ -z "${ARCH:-}" ]] && ARCH="$(uname -m)"
 
   readonly OS="linux"
   readonly ARCH="$(remap_arch "${ARCH}" x86_64 aarch64 armv7 armv6)"
