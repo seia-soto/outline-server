@@ -19,14 +19,19 @@ export DOCKER_CONTENT_TRUST="${DOCKER_CONTENT_TRUST:-1}"
 export DOCKER_BUILDKIT=1
 
 # Detect and set architecture for general users to build without installing emulator.
-if [[ -z "${SB_PLATFORM}" ]]; then
-    SB_PLATFORM="$(uname -m)"
+remap_arch() {
+  local ARCH="${1}" AMD64="${2:-amd64}" ARM64="${3:-arm64}" ARMv7="${4:-armv7}" ARMv6="${5:-armv6}"
 
-    # Specify the target platform with `$SB_PLATFORM`.
-    [[ "${SB_PLATFORM}" == "x86_64" ]] && export SB_PLATFORM="linux/amd64"
-    [[ "${SB_PLATFORM}" == "aarch64" ]] && export SB_PLATFORM="linux/arm64"
-    [[ "${SB_PLATFORM}" == "armv7l" ]] && export SB_PLATFORM="linux/arm/v7"
-fi
+  [[ "${ARCH}" == *"amd64"* || "${ARCH}" == *"x86_64"* ]] && ARCH="${AMD64}"
+  [[ "${ARCH}" == *"arm64"* ]] && ARCH="${ARM64}"
+  [[ "${ARCH}" == *"v7"* ]] && ARCH="${ARMv7}"
+  [[ "${ARCH}" == *"v6"* ]] && ARCH="${ARMv6}"
+
+  echo "${ARCH}"
+}
+
+# Specify the target platform with `$SB_PLATFORM`.
+[[ -z "${SB_PLATFORM}" ]] && SB_PLATFORM="$(remap_arch "$(uname -m)" linux/amd64 linux/arm64 linux/arm/v7 linux/arm/v6)"
 
 # Newer node images have no valid content trust data.
 # Pin the image node:16.12-alpine3.14 by tag for multi-platform support.
@@ -35,11 +40,11 @@ readonly NODE_IMAGE="node:16.12-alpine3.14"
 
 # Use Docker Buildx for building multi-platform images.
 docker buildx build \
-    --platform="${SB_PLATFORM}" \
-    --push \
-    --force-rm \
-    --build-arg NODE_IMAGE="${NODE_IMAGE}" \
-    --build-arg GITHUB_RELEASE="${TRAVIS_TAG:-none}" \
-    -f src/shadowbox/docker/Dockerfile \
-    -t "${SB_IMAGE:-outline/shadowbox}" \
-    "${ROOT_DIR}"
+  --platform="${SB_PLATFORM}" \
+  --push \
+  --force-rm \
+  --build-arg NODE_IMAGE="${NODE_IMAGE}" \
+  --build-arg GITHUB_RELEASE="${TRAVIS_TAG:-none}" \
+  -f src/shadowbox/docker/Dockerfile \
+  -t "${SB_IMAGE:-outline/shadowbox}" \
+  "${ROOT_DIR}"

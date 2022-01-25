@@ -31,7 +31,10 @@ COPY scripts scripts/
 COPY src src/
 COPY tsconfig.json ./
 COPY third_party third_party
-RUN ROOT_DIR=/ npm run action shadowbox/server/build
+
+# Use `$TARGETPLATFORM` to determine arch (requires Docker BuildKit)
+ARG TARGETPLATFORM
+RUN ARCH="${TARGETPLATFORM}" ROOT_DIR=/ npm run action shadowbox/server/build
 
 # shadowbox image
 FROM ${NODE_IMAGE}
