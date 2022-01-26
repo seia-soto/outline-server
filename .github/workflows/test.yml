@@ -49,7 +49,7 @@ jobs:
       - name: Shadowbox with Docker
         run: |
           export SB_PLATFORM="${{ matrix.arch }}"
-          export SB_IMAGE="shadowbox-test"
+          export SB_IMAGE="shadowbox:test"
 
           npm run action shadowbox/docker/build
           bash scripts/install_server.sh --hostname test
