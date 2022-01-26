@@ -19,7 +19,7 @@ export DOCKER_CONTENT_TRUST="${DOCKER_CONTENT_TRUST:-1}"
 export DOCKER_BUILDKIT=1
 # Set output variant (https://docs.docker.com/engine/reference/commandline/buildx_build/#output)
 # The image will be named using `SB_IMAGE` variable.
-export SB_OUTPUT="${SB_OUTPUT:-type=image,push=false}"
+export SB_OUTPUT="${SB_OUTPUT:-type=docker}"
 
 # Detect and set architecture for general users to build without installing emulator.
 if [[ -z "${SB_PLATFORM:-}" ]]; then
@@ -38,8 +38,8 @@ readonly NODE_IMAGE="node:16.12-alpine3.14"
 
 # Use Docker Buildx for building multi-platform images.
 docker buildx build \
-    --platform="${SB_PLATFORM}" \
-    --output="${SB_OUTPUT}" \
+    --platform "${SB_PLATFORM}" \
+    --output "${SB_OUTPUT}" \
     --force-rm \
     --build-arg NODE_IMAGE="${NODE_IMAGE}" \
     --build-arg GITHUB_RELEASE="${TRAVIS_TAG:-none}" \
