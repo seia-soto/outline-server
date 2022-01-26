@@ -17,13 +17,17 @@
 export DOCKER_CONTENT_TRUST="${DOCKER_CONTENT_TRUST:-1}"
 # Enable Docker BuildKit (https://docs.docker.com/develop/develop-images/build_enhancements)
 export DOCKER_BUILDKIT=1
+# Set output variant (https://docs.docker.com/engine/reference/commandline/buildx_build/#output)
+# The image will be named using `SB_IMAGE` variable.
+# The reason is unknown but `type=image` doesn't work on CI.
+export SB_OUTPUT="${SB_OUTPUT:-type=docker}"
 
 # Detect and set architecture for general users to build without installing emulator.
 remap_arch() {
   local ARCH="${1}" AMD64="${2:-amd64}" ARM64="${3:-arm64}" ARMv7="${4:-armv7}" ARMv6="${5:-armv6}"
 
   [[ "${ARCH}" == *"amd64"* || "${ARCH}" == *"x86_64"* ]] && ARCH="${AMD64}"
-  [[ "${ARCH}" == *"arm64"* ]] && ARCH="${ARM64}"
+  [[ "${ARCH}" == *"arm64"* || "${ARCH}" == *"aarch64"* ]] && ARCH="${ARM64}"
   [[ "${ARCH}" == *"v7"* ]] && ARCH="${ARMv7}"
   [[ "${ARCH}" == *"v6"* ]] && ARCH="${ARMv6}"
 
@@ -40,8 +44,8 @@ readonly NODE_IMAGE="node:16.12-alpine3.14"
 
 # Use Docker Buildx for building multi-platform images.
 docker buildx build \
-  --platform="${SB_PLATFORM}" \
-  --push \
+  --platform "${SB_PLATFORM}" \
+  --output "${SB_OUTPUT}" \
   --force-rm \
   --build-arg NODE_IMAGE="${NODE_IMAGE}" \
   --build-arg GITHUB_RELEASE="${TRAVIS_TAG:-none}" \
