@@ -52,4 +52,7 @@ jobs:
           export SB_IMAGE="shadowbox:test"
 
           npm run action shadowbox/docker/build
+
+          docker images
+
           bash scripts/install_server.sh --hostname test
