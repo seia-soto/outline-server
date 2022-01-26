@@ -17,15 +17,19 @@
 export DOCKER_CONTENT_TRUST="${DOCKER_CONTENT_TRUST:-1}"
 # Enable Docker BuildKit (https://docs.docker.com/develop/develop-images/build_enhancements)
 export DOCKER_BUILDKIT=1
+# Set output variant (https://docs.docker.com/engine/reference/commandline/buildx_build/#output)
+# The image will be named using `SB_IMAGE` variable.
+# The reason is unknown but `type=image` doesn't work on CI.
+export SB_OUTPUT="${SB_OUTPUT:-type=docker}"
 
 # Detect and set architecture for general users to build without installing emulator.
 if [[ -z "${SB_PLATFORM:-}" ]]; then
-    SB_PLATFORM="$(uname -m)"
+  SB_PLATFORM="$(uname -m)"
 
-    # Specify the target platform with `$SB_PLATFORM`.
-    [[ "${SB_PLATFORM}" == "x86_64" ]] && export SB_PLATFORM="linux/amd64"
-    [[ "${SB_PLATFORM}" == "aarch64" ]] && export SB_PLATFORM="linux/arm64"
-    [[ "${SB_PLATFORM}" == "armv7l" ]] && export SB_PLATFORM="linux/arm/v7"
+  # Specify the target platform with `$SB_PLATFORM`.
+  [[ "${SB_PLATFORM}" == "x86_64" ]] && export SB_PLATFORM="linux/amd64"
+  [[ "${SB_PLATFORM}" == "aarch64" ]] && export SB_PLATFORM="linux/arm64"
+  [[ "${SB_PLATFORM}" == "armv7l" ]] && export SB_PLATFORM="linux/arm/v7"
 fi
 
 # Newer node images have no valid content trust data.
@@ -35,11 +39,11 @@ readonly NODE_IMAGE="node:16.12-alpine3.14"
 
 # Use Docker Buildx for building multi-platform images.
 docker buildx build \
-    --platform="${SB_PLATFORM}" \
-    --push \
-    --force-rm \
-    --build-arg NODE_IMAGE="${NODE_IMAGE}" \
-    --build-arg GITHUB_RELEASE="${TRAVIS_TAG:-none}" \
-    -f src/shadowbox/docker/Dockerfile \
-    -t "${SB_IMAGE:-outline/shadowbox}" \
-    "${ROOT_DIR}"
+  --platform "${SB_PLATFORM}" \
+  --output "${SB_OUTPUT}" \
+  --force-rm \
+  --build-arg NODE_IMAGE="${NODE_IMAGE}" \
+  --build-arg GITHUB_RELEASE="${TRAVIS_TAG:-none}" \
+  -f src/shadowbox/docker/Dockerfile \
+  -t "${SB_IMAGE:-outline/shadowbox}" \
+  "${ROOT_DIR}"
